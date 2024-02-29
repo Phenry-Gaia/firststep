@@ -1,0 +1,97 @@
+     A*%%TS  SD  20140730  110030  BERTHOIN    REL-V7R1M0  5770-WDS
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/SNDOBJP SNDOBJP)
+     A                                      CA03(03)
+     A          R SFL01                     SFL
+     A*%%TS  SD  20140724  150913  BERTHOIN    REL-V7R1M0  5770-WDS
+     A            OPT01          1A  B  8  3
+     A            SNDCOM    R        O  8  5
+     A            SNDOBJ    R        O  8 12
+     A            SNDLIB    R        O  8 23
+     A            SNDTYP    R        O  8 34
+     A            SNDUSR    R        O  8 45
+     A            SYT01         12A  O  8 56
+     A            SNDLIBR   R        O  8 69
+     A            SNDSYS    R        H
+     A*
+     A          R CTL01                     SFLCTL(SFL01)
+     A                                      CA05(05)
+     A                                      CA06(06)
+     A                                      CA10(10)
+     A*%%TS  SD  20140724  155947  BERTHOIN    REL-V7R1M0  5770-WDS
+     A                                      SFLSIZ(0013)
+     A                                      SFLPAG(0012)
+     A N50                                  ROLLUP(49)
+     A                                      OVERLAY
+     A  41                                  SFLDSP
+     A  42                                  SFLDSPCTL
+     A  40                                  SFLCLR
+     A  43                                  SFLEND(*MORE)
+     A                                  7  3'O Comm.  Objet      Biblio     Typ-
+     A                                      e       User       Système      Bib-
+     A                                      lio RST '
+     A                                      DSPATR(UL)
+     A                                  2  4DATE
+     A                                      EDTCDE(Y)
+     A                                  2 13TIME
+     A                                  6  3'4'
+     A                                      DSPATR(HI)
+     A                                  6  5'Supprimer'
+     A                                  4 34'Nombre :'
+     A            NBRSND         4N 0O  4 43
+     A                                  2 30'Envois groupés'
+     A                                      DSPATR(HI)
+     A                                  5  3'3'
+     A                                      DSPATR(HI)
+     A                                  5  5'Duppliquer'
+     A          R FMT01
+     A*%%TS  SD  20140730  110030  BERTHOIN    REL-V7R1M0  5770-WDS
+     A                                 22  2'F3=Exit'
+     A                                      DSPATR(HI)
+     A                                 22 26'F6=Créer'
+     A                                      DSPATR(HI)
+     A                                 22 11'F5=Réafficher'
+     A                                      DSPATR(HI)
+     A                                 22 37'F10=Exécuter envoi groupé'
+     A                                      DSPATR(HI)
+     A          R FMT02
+     A*%%TS  SD  20140724  154849  BERTHOIN    REL-V7R1M0  5770-WDS
+     A                                      WINDOW(3 3 15 45)
+     A                                      RMVWDW
+     A                                      CA12(12)
+     A            SNDCOM    R        B  3 15
+     A  65                                  DSPATR(PR)
+     A            SNDSYS1   R  -40   B  6  4REFFLD(SNDOBJP/SNDSYS *LIBL/SNDOBJP)
+     A  65                                  DSPATR(PR)
+     A            SNDUSR    R        B  8 15
+     A  65                                  DSPATR(PR)
+     A            SNDOBJ    R        B  9 15
+     A  65                                  DSPATR(PR)
+     A            SNDLIB    R        B 10 15
+     A  65                                  DSPATR(PR)
+     A            SNDTYP    R        B 11 15
+     A  65                                  DSPATR(PR)
+     A            SNDLIBR   R        B 12 15
+     A  65                                  DSPATR(PR)
+     A            SNDSYS2   R  -40   B  7  4REFFLD(SNDOBJP/SNDSYS *LIBL/SNDOBJP)
+     A  65                                  DSPATR(PR)
+     A                                  1  6'Détail de l''envoi'
+     A                                      DSPATR(HI)
+     A                                 14  1'F12=Abandon'
+     A                                      DSPATR(HI)
+     A                                  3  1'Commande :'
+     A                                      DSPATR(HI)
+     A                                  5  1'Système  :'
+     A                                      DSPATR(HI)
+     A                                  8  1'User     :'
+     A                                      DSPATR(HI)
+     A                                  9  1'Objet(s) :'
+     A                                      DSPATR(HI)
+     A                                 10  1'Biblioth :'
+     A                                      DSPATR(HI)
+     A                                 11  1'Type     :'
+     A                                      DSPATR(HI)
+     A                                 12  1'Bib/RST  :'
+     A                                      DSPATR(HI)
+     A            LIB02         13   O  1 26

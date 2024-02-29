@@ -1,0 +1,166 @@
+     /************************************************************************/
+     /* Envoi d'un spool par mail                                            */
+     /*     sous forme de fichier pdf , txt, ou html                         */
+     /*                                                                      */
+     /*                                                                      */
+     /************************************************************************/
+             PGM        PARM(&FROMFILE &EMAIL &QUALJOB &SPLID &TOFMT +
+                          &STMFOPT &SUJET &NOTE)
+             DCL        VAR(&FromFile  ) TYPE(*CHAR) LEN( 10   )
+             DCL        VAR(&Email     ) TYPE(*CHAR) LEN( 128  )
+             DCL        VAR(&QualJob   ) TYPE(*CHAR) LEN(  26  )
+             DCL        VAR(&IntJob    ) TYPE(*CHAR) LEN(  16  )
+             DCL        VAR(&IntSplID  ) TYPE(*CHAR) LEN(  16  )
+             DCL        VAR(&Job       ) TYPE(*CHAR) LEN(  10  )
+             DCL        VAR(&User      ) TYPE(*CHAR) LEN(  10  )
+             DCL        VAR(&JobNbr    ) TYPE(*CHAR) LEN(   6  )
+             DCL        VAR(&SplID     ) TYPE(*DEC ) LEN(   4 0)
+             DCL        VAR(&HexSplID  ) TYPE(*CHAR) LEN(   4  )
+             DCL        VAR(&ToFmt     ) TYPE(*CHAR) LEN(   5  )
+             DCL        VAR(&StmfOpt   ) TYPE(*CHAR) LEN(   8  )
+             DCL        VAR(&sujet     ) TYPE(*CHAR) LEN(  60  )
+             DCL        VAR(&Note      ) TYPE(*CHAR) LEN(  300 )
+             DCL        Var(&SplNbr    ) TYPE(*CHAR) LEN(   5  )
+dcl &date *char 6
+dcl &tofile *char 100
+dcl &usr    *char 10
+dcl &syst    *char 08
+dcl &title   *char 80
+dcl &CCSID   *dec (5 0)
+
+/* (A) Extract job name from qualified Job name  */
+
+             CHGVAR     &Job     %sst(&QualJob  1 10)
+             CHGVAR     &User    %sst(&QualJob 11 10)
+             CHGVAR     &JobNbr  %sst(&QualJob 21  6)
+
+/* (B) Convert special value * to current job details   */
+
+             IF         (&Job *eq '*') DO
+                RTVJOBA    JOB(&Job) USER(&User) NBR(&JobNbr)
+             ENDDO
+
+/* (C) Set up spooled file number from special values   */
+
+             CHGVAR     &SplNbr &SplID
+             IF         (&SplID *EQ -2) DO
+                CHGVAR     &SplNbr '*LAST'
+             ENDDO
+             IF         (&SplID *EQ -3) DO
+                CHGVAR     &SplNbr '*ONLY'
+             ENDDO
+ /*-----------------------------*/
+ /* Information pour mail       */
+ /*-----------------------------*/
+             if  (&sujet = '*NONE')  then(do)
+             CHGVAR     VAR(&SUJET) VALUE('Réception du fichier' +
+                          *bcat &FROMFILE *TCAT '_' *TCAT &DATE +
+                          *bcat 'au format'  *bcat &TOFMT)
+             enddo
+             if  (&note  = '*NONE')  then(do)
+             CHGVAR     VAR(&NOTE) VALUE('Pas de commentaire associé')
+             enddo
+ /*--------------------------------------*/
+ /* extraction des informations en cours */
+ /*--------------------------------------*/
+             RTVJOBA    USER(&USR) CCSID(&CCSID)
+             RTVSYSVAL  SYSVAL(QDATE) RTNVAR(&DATE)
+             RTVNETA    SYSNAME(&SYST)
+             CHGJOB     CCSID(1147)
+ /*--------------------------------------*/
+ /* selection du type de document cours */
+ /*--------------------------------------*/
+             SELECT
+             WHEN       COND(&TOFMT = '*PDF') THEN(CALLSUBR +
+                          SUBR(TRT_PDF))
+             WHEN       COND(&TOFMT = '*HTML') THEN(CALLSUBR +
+                          SUBR(TRT_HTML))
+             WHEN       COND(&TOFMT = '*TEXT') THEN(CALLSUBR +
+                          SUBR(TRT_TXT))
+             ENDSELECT
+ /*------------------------------------------------------------------*/
+ /* Suppression fichier de travail                                   */
+ /*------------------------------------------------------------------*/
+             rmvlnk (&TOFILE)
+             CHGJOB     CCSID(&CCSID)
+ /*------------------------------------------------------------------*/
+ /* traitement PDF                                                   */
+ /*------------------------------------------------------------------*/
+             SUBR       SUBR(TRT_PDF)
+             CHGVAR     VAR(&TOFILE) VALUE(&FROMFILE *TCAT '_' *TCAT +
+                          &DATE *TCAT '.PDF')
+             CPYSPLF    FILE(&fromfile) TOFILE(*TOSTMF) +
+                          JOB(&JOBNBR/&USER/&JOB) SPLNBR(&SPLNBR) +
+                          TOSTMF(&TOFILE) WSCST(*PDF) STMFOPT(*REPLACE)
+             SNDSMTPEMM RCP((&EMAIL)) SUBJECT(&SUJET) NOTE(&NOTE) +
+                          ATTACH((&TOFILE))
+             monmsg tcp5092 exec(do)
+             SNDUSRMSG  MSG('Utilisateur non inscript à SMTP')
+             enddo
+             ENDSUBR
+ /*------------------------------------------------------------------*/
+ /* traitement HTML                                                  */
+ /*------------------------------------------------------------------*/
+             SUBR       SUBR(TRT_HTML)
+             chgvar &title (&sujet)
+             CHGVAR     VAR(&TOFILE) VALUE(&FROMFILE *TCAT '_' *TCAT +
+                          &DATE *TCAT '.HTML')
+             CHKOBJ     OBJ(QTEMP/SPL132) OBJTYPE(*FILE)
+             monmsg cpf9801 exec(do)
+             CRTPF      FILE(QTEMP/SPL132) RCDLEN(132) FILETYPE(*DATA)
+             goto suite
+             enddo
+             clrpfm     FILE(QTEMP/SPL132)
+             suite:
+ /*------------------------------------------------------------------*/
+ /* Ecriture entête de page                                          */
+ /*------------------------------------------------------------------*/
+             RUNSQL     SQL('INSERT INTO QTEMP/SPL132 VALUES(   +
+                           ''<HTML> <HEAD> <TITLE>' *tcat &title +
+                          *tcat '.'')') COMMIT(*NONE)
+             RUNSQL     SQL('INSERT INTO QTEMP/SPL132 VALUES(   +
+                                 ''</TITLE> </HEAD> <BODY +
+                          BGCOLOR=#C0C0C0> <B> <PRE> <SMALL>'')') +
+                          COMMIT(*NONE)
+             CPYSPLF    FILE(&fromfile) TOFILE(QTEMP/SPL132) +
+                          JOB(&JOBNBR/&USER/&JOB) SPLNBR(&SPLNBR) +
+                          MBROPT(*ADD)
+ /*------------------------------------------------------------------*/
+ /* Ecriture pied   de page                                          */
+ /*------------------------------------------------------------------*/
+             RUNSQL     SQL('INSERT INTO QTEMP/SPL132 VALUES(       +
+                                 ''</SMALL><PRE></B><P +
+                     align=center><SMALL><SMALL>Créé sur'  *bcat +
+                       &syst *bcat 'par' *bcat &usr +
+                   *tcat  '.'')') COMMIT(*NONE)
+             RUNSQL     SQL('INSERT INTO QTEMP/SPL132 VALUES(       +
+                                 +
+                          ''</SMALL></SMALL></P></BODY></HTML>'')') +
+                          COMMIT(*NONE)
+             CPYTOSTMF  +
+                          FROMMBR('/qsys.lib/qtemp.lib/spl132.file/sp+
+                          l132.mbr') TOSTMF(&TOFILE) STMFOPT(*REPLACE)
+             SNDSMTPEMM RCP((&EMAIL)) SUBJECT(&SUJET) NOTE(&NOTE) +
+                          ATTACH((&TOFILE *OCTET *TXT)) +
+                          CHARSET(*UTF8) CONTENT(*HTML)
+             monmsg tcp5092 exec(do)
+             SNDUSRMSG  MSG('Utilisateur non inscript à SMTP')
+             enddo
+
+             ENDSUBR
+ /*------------------------------------------------------------------*/
+ /* traitement TXT                                                   */
+ /*------------------------------------------------------------------*/
+             SUBR       SUBR(TRT_TXT)
+             CHGVAR     VAR(&TOFILE) VALUE(&FROMFILE *TCAT '_' *TCAT +
+                          &DATE *TCAT '.TXT')
+             CPYSPLF    FILE(&fromfile) TOFILE(*TOSTMF) +
+                          JOB(&JOBNBR/&USER/&JOB) SPLNBR(&SPLNBR) +
+                          TOSTMF(&TOFILE) STMFOPT(*REPLACE)
+             SNDSMTPEMM RCP((&EMAIL)) SUBJECT(&SUJET) NOTE(&NOTE) +
+                          ATTACH((&TOFILE *OCTET *TXT)) CHARSET(*UTF8)
+             monmsg tcp5092 exec(do)
+             SNDUSRMSG  MSG('Utilisateur non inscript à SMTP')
+             enddo
+             ENDSUBR
+             ENDPGM

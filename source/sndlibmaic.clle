@@ -1,0 +1,44 @@
+pgm        parm(&LIB &MAIL &zip &version)
+             dcl        &lib *char 10
+             dcl        &mail *char 50
+             dcl        &zip  *char 4
+             dcl        &version *char 8
+             dcl        &lnkf *char 100
+             dcl        &lnkz *char 100
+             dcl        &lnko *char 100
+             dcl        &subj *char 100
+             dcl        &note *char 100
+/* Création environnement pour webconsole */
+             crtdir     ('/webservice/savf/')
+             monmsg     CPFA0A0
+             crtlib     (websavf)
+             monmsg     CPF2111
+             chgvar     &lnkf ('/webservice/savf/' *tcat &lib *tcat +
+                          '.savf')
+             RMVLNK     OBJLNK(&LNKF)
+             monmsg     (CPFA0A0 CPFA0A9)
+             chgvar     &lnko ('/qsys.lib/websavf.lib/' *tcat &lib *tcat +
+                          '.file')
+   chgvar     &subj ('fichier SAVF :' *bcat &lib *tcat '.savf')
+             CHGVAR     VAR(&NOTE) VALUE('rstlib lib(' *BCAT &LIB *TCAT ') +
+                          DEV(*SAVF) SAVF(WEBSAVF/' *BCAT &LIB *TCAT ')')
+             dltf       FILE(websavf/&LIB)
+             monmsg     CPF2105
+             CRTSAVF    FILE(websavf/&LIB)
+             SAVLIB     LIB(&LIB) DEV(*SAVF) SAVF(WEBSAVF/&LIB) +
+                          TGTRLS(&VERSION) DTACPR(*HIGH)
+                          monmsg CPF3702
+             CPY        OBJ(&LNKO) TOOBJ(&LNKF) DTAFMT(*BINARY)
+             if (&zip = '*YES')   then(do)
+             chgvar &lnkz (&lnkf *tcat '.zip')
+             RMVLNK     OBJLNK(&LNKZ)
+             monmsg     (CPFA0A0 CPFA0A9)
+             CPYTOARCF  FROMFILE(&lnkf) TOARCF(&lnkz)
+             SNDSMTPEMM RCP((&MAIL)) SUBJECT(&SUBJ) NOTE(&NOTE) +
+                          ATTACH((&LNKZ))
+             enddo
+             else do
+             SNDSMTPEMM RCP((&MAIL)) SUBJECT(&SUBJ) NOTE(&NOTE) +
+                          ATTACH((&LNKF))
+             enddo
+   endpgm

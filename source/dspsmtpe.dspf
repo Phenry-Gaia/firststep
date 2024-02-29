@@ -1,0 +1,67 @@
+     A*%%TS  SD  20130716  164617  BERTHOIN    REL-V7R1M0  5770-WDS
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A          R SFL01                     SFL
+     A*%%TS  SD  20130716  164617  BERTHOIN    REL-V7R1M0  5770-WDS
+     A            OPT01          1A  B  8  2
+     A            EDAT_MAIL      8S 0O  8  8
+     A  98                                  COLOR(RED)
+     A            EHRE_MAIL      6S 0O  8 17
+     A  98                                  COLOR(RED)
+     A            EEMETTEUR     20A  O  8 24
+     A  98                                  COLOR(RED)
+     A            ERECEPTEUR    26A  O  8 45
+     A  98                                  COLOR(RED)
+     A            ESTATUS        9A  O  8 72
+     A  98                                  COLOR(RED)
+     A            ENUMERO       29A  H
+     A  98                                  COLOR(RED)
+     A            ETYPE_MAIL     3   O  8  4
+     A  98                                  COLOR(RED)
+     A          R CTL01                     SFLCTL(SFL01)
+     A*%%TS  SD  20130716  163213  BERTHOIN    REL-V7R1M0  5770-WDS
+     A                                      SFLSIZ(0013)
+     A                                      SFLPAG(0012)
+     A                                      CA15(15)
+     A                                      CA03(03)
+     A                                      CF06(06)
+     A                                      CF05(05)
+     A N50                                  ROLLUP(49)
+     A                                      OVERLAY
+     A  41                                  SFLDSP
+     A  42                                  SFLDSPCTL
+     A  40                                  SFLCLR
+     A  43                                  SFLEND(*MORE)
+     A                                  7  3' Typ  Date    Heure   Emetteur    -
+     A                                               Récepteur                 -
+     A                                       status '
+     A                                      DSPATR(UL)
+     A                                  2 26'Historique des envois de mail'
+     A                                      DSPATR(HI)
+     A                                  5  4'1=Pour afficher le détail'
+     A                                      DSPATR(HI)
+     A            DATDEB         6A  O  4 57
+     A                                  4 52'De :'
+     A                                      DSPATR(HI)
+     A                                  5 52'A  :'
+     A                                      DSPATR(HI)
+     A            DATFIN         6A  O  5 57
+     A                                  4 64'à'
+     A                                      DSPATR(HI)
+     A                                  5 64'à'
+     A                                      DSPATR(HI)
+     A            TIMDEB         6A  O  4 66
+     A            TIMFIN         6A  O  5 66
+     A  88                              3 38'Plus de 9999 enr.  Affinez votre r-
+     A                                      echerche.'
+     A                                      DSPATR(HI)
+     A                                      DSPATR(RI)
+     A                                  2  4DATE
+     A                                      EDTCDE(Y)
+     A                                  2 13TIME
+     A                                  3  4'SMTP'
+     A            ESMTP         25   O  3  9
+     A          R FMT01
+     A*%%TS  SD  20130716  162122  BERTHOIN    REL-V7R1M0  5770-WDS
+     A                                 22  3'F3=EXIT'
+     A                                 22 13'F15=Sortie Fichier'

@@ -1,0 +1,5 @@
+pgm
+             INCLUDE    SRCMBR(ERREUR1)
+             STRSEU     SRCFILE(QTEMP/QFTPLOG) SRCMBR(SAVFLG)
+             INCLUDE    SRCMBR(ERREUR2)
+endpgm

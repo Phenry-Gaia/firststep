@@ -1,0 +1,12 @@
+/*--------------------------------------------------------------*/
+/* Suite à un changement d'adresse IP                           */
+/* Ce programme permet de changer l'interface utilisée par SMTP */
+/*--------------------------------------------------------------*/
+pgm (&fromip &toip)
+dcl &fromip *char 16
+dcl &toip   *char 16
+RMVSMTPLE TYPE(*CLTBIND) INTNETADR(&fromip   )
+RMVSMTPLE TYPE(*SVRBIND) INTNETADR(&fromip   )
+ADDSMTPLE TYPE(*CLTBIND) INTNETADR(&toip)
+ADDSMTPLE TYPE(*SVRBIND) INTNETADR(&toip)
+endpgm

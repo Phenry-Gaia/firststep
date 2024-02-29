@@ -1,0 +1,30 @@
+     A*%%TS  SD  20101220  121258  BERTHOIN    REL-V6R1M0  5761-WDS
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      PRINT
+     A          R FMT01
+     A*%%TS  SD  20101220  121258  BERTHOIN    REL-V6R1M0  5761-WDS
+     A                                      CA12(12)
+     A                                  3 24'Test du paramètre passé (SUBFILE)'
+     A                                  6  2'+------------------- Paramètre rec-
+     A                                      u ----------------------------------
+     A                                      --------+'
+     A                                  8  2'1234+6789+1234+6789+1234+6789+1234-
+     A                                      +6789+1234+6789+1234+6789+1234+6789-
+     A                                      +1234+678'
+     A                                      DSPATR(RI)
+     A            PARM          78A  O  9  2DSPATR(HI)
+     A                                 11  2'+----------------------------------
+     A                                      ------------------------------------
+     A                                      --------+'
+     A                                 13  3'Position 1 :'
+     A                                 23  3'F12=Annuler'
+     A                                 13 24'Option du SFL'
+     A                                      DSPATR(HI)
+     A                                 15  3'Position'
+     A                                 15 12'2'
+     A                                 15 14'à'
+     A                                 15 16'79'
+     A                                 15 19':'
+     A                                 15 24'Paramètre du SFL'
+     A                                      DSPATR(HI)

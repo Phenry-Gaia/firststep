@@ -1,0 +1,31 @@
+     A*%%TS  SD  20130717  143836  BERTHOIN    REL-V7R1M0  5770-WDS
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A          R SFL01                     SFL
+     A*%%TS  SD  20100908  115424  BERTHOPL    REL-V5R3M0  5722-WDS
+     A            WDETAIL       70A  O  8  5
+     A          R CTL01                     SFLCTL(SFL01)
+     A*%%TS  SD  20130717  143836  BERTHOIN    REL-V7R1M0  5770-WDS
+     A                                      SFLSIZ(0013)
+     A                                      SFLPAG(0012)
+     A                                      CF12(12)
+     A                                      OVERLAY
+     A  41                                  SFLDSP
+     A  42                                  SFLDSPCTL
+     A  40                                  SFLCLR
+     A  43                                  SFLEND(*MORE)
+     A                                  3 24'Détail Emission :'
+     A                                      DSPATR(UL)
+     A            ID            29A  O  3 44
+     A                                  5  6'Job :'
+     A            JOJOB     R        O  5 12REFFLD(QJORDJE/JOJOB *LIBL/LOGMAIL)
+     A                                  5 24'User :'
+     A            JOUSER    R        O  5 31REFFLD(QJORDJE/JOUSER *LIBL/LOGMAIL)
+     A                                  5 43'Nbr :'
+     A            JONBR     R        O  5 49REFFLD(QJORDJE/JONBR *LIBL/LOGMAIL)
+     A                                  5 57'Pgm :'
+     A            JOPGM     R        O  5 63REFFLD(QJORDJE/JOPGM *LIBL/LOGMAIL)
+     A                                  7  6'Détail des postes du journal QZMF'
+     A          R FMT01
+     A*%%TS  SD  20100908  115729  BERTHOPL    REL-V5R3M0  5722-WDS
+     A                                 22  3'F12=Retours'

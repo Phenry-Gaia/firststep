@@ -1,0 +1,116 @@
+/*-------------------------------------------------------------------*/
+/* Envoi d'une bibliothèque par FTP                                  */
+/*-------------------------------------------------------------------*/
+             PGM        PARM(&SYS &USR &PWD &LIB &LIBF &REPERT &PORT +
+          &rstlib   &DLTSAVF &CLRLOG &version)
+/* PARAMETRES */
+             DCL        &SYS *CHAR 80
+             DCL        &USR *CHAR 10
+             DCL        &PWD *CHAR 50
+             DCL        &LIB *CHAR 10
+             DCL        &LIBF *CHAR 10
+             DCL        &REPERT *CHAR 50
+             DCL        &port   *dec  (5 0)
+             DCL        &dltsavf *CHAR 04
+             DCL        &clrlog *CHAR 04
+             DCL        &rstlib *CHAR 04
+             DCL        &versio  *CHAR 08
+/* VARIABLES DE TRAVAIL */
+             DCL        &TIM  *CHAR 6
+             DCL        &dat  *CHAR 6
+             INCLUDE    SRCMBR(ERREUR1)
+             RTVSYSVAL  SYSVAL(QTIME) RTNVAR(&TIM)
+             RTVSYSVAL  SYSVAL(Qdate) RTNVAR(&dat)
+
+/*-----------------------------------------------------------------*/
+/* CREATION DU FICHIER DE SAUVEGARDE   ET SAUVEGARDE               */
+/*-----------------------------------------------------------------*/
+             CRTSAVF    &LIBF/&lib
+             MONMSG     CPF7302 exec(do)
+                ClrSAVF    &LIBF/&lib
+             enddo
+
+/*-----------------------------------------------------------------*/
+/* MODIFICATION DES DROITS PUBLICS                                 */
+/*-----------------------------------------------------------------*/
+             SAVLIB     LIB(&LIB) DEV(*SAVF) SAVF(&LIBF/&LIB) +
+                          PVTAUT(*YES) DTACPR(*HIGH)  tgtrls(&version)
+/* Création Fichier de scripte FTP */
+             CRTPF   FILE(QTEMP/QFTPSRC) RCDLEN(192)
+             MONMSG     CPF7302  EXEC(DO)
+                CLRPFM     FILE(QTEMP/QFTPSRC)
+             ENDDO
+/* Création Fichier de log FTP */
+             CRTSRCPF   FILE(QTEMP/QFTPLOG) RCDLEN(192) MBR(SAVFLG)
+             MONMSG     CPF7302  EXEC(DO)
+                CLRPFM     FILE(QTEMP/QFTPLOG) MBR(SAVFLG)
+                GOTO       SUITE
+             ENDDO
+
+ SUITE:
+/*-----------------------------------------------------------------*/
+/* substitution INPUT par qftpsrc                                  */
+/*-----------------------------------------------------------------*/
+     OVRDBF     FILE(INPUT) TOFILE(QTEMP/QFTPSRC)
+/*-----------------------------------------------------------------*/
+/* CREATION DU scripte ftp                                         */
+/*-----------------------------------------------------------------*/
+
+             RUNSQL     SQL('INSERT INTO QTEMP/QFTPSRC VALUES(''' +
+                         *CAT &USR *BCAT &PWD *CAT ''')') COMMIT(*NONE)
+             RUNSQL     SQL('INSERT INTO QTEMP/QFTPSRC VALUES(''' +
+                          *TCAT 'lcd' *BCAT &LIBF *CAT ''')') +
+                          COMMIT(*NONE)
+             RUNSQL     SQL('INSERT INTO QTEMP/QFTPSRC VALUES(''' +
+                          *TCAT 'cd' *BCAT &repert *CAT ''')') +
+                          COMMIT(*NONE)
+             RUNSQL     SQL('INSERT INTO QTEMP/QFTPSRC +
+                          VALUES(''BIN'')') COMMIT(*NONE)
+             RUNSQL     SQL('INSERT INTO QTEMP/QFTPSRC VALUES('' +
+             quote rcmd    CRTSAVF' *bCAT &LIBf *TCAT +
+                          '/' *TCAT &LIB *TCAT +
+                          ''')') COMMIT(*NONE)
+             RUNSQL     SQL('INSERT INTO QTEMP/QFTPSRC VALUES(''' +
+                          *TCAT 'put' *BCAT &lib *tcat '.savf' +
+                    *bcat  &lib *tcat '.savf'')') +
+                         COMMIT(*NONE)
+ /* syscmd     RSTLIB SAVLIB(TstFTP) DEV(*SAVF) SAVF(TSTFTP) */
+if cond(&rstlib  *eq '*YES') then(do)
+             RUNSQL     SQL('INSERT INTO QTEMP/QFTPSRC VALUES('' +
+                          quote rcmd RSTLIB SAVLIB(' *TCAT &LIB +
+                          *TCAT ') DEV(*SAVF) SAVF(' *TCAT &LIBF +
+                          *TCAT '/' *TCAT &lib *TCAT ')'')') +
+                          COMMIT(*NONE)
+             RUNSQL     SQL('INSERT INTO QTEMP/QFTPSRC VALUES('' +
+               quote rcmd DLTF' *bCAT &LIBf *TCAT +
+                          '/' *TCAT &LIB *TCAT +
+                          ''')') COMMIT(*NONE)
+enddo
+             RUNSQL     SQL('INSERT INTO QTEMP/QFTPSRC +
+                          VALUES(''QUIT'')') COMMIT(*NONE)
+
+/*-----------------------------------------------------------------*/
+/* EXECUTION DU SCRIPTE FTP                                        */
+/*-----------------------------------------------------------------*/
+             OVRDBF     FILE(OUTPUT) TOFILE(QTEMP/QFTPLOG) MBR(SAVFLG)
+             FTP        RMTSYS(&SYS) PORT(&PORT)
+             DLTOVR     INPUT
+             MONMSG     CPF0000
+             DLTOVR     OUTPUT
+             MONMSG     CPF0000
+/* Effacement log    */
+if cond(&clrlog   *eq '*YES') then(do)
+             CLRPFM     FILE(QTEMP/QFTPLOG) MBR(SAVFLG)
+             enddo
+             else do
+             CHGPFM     FILE(QTEMP/QFTPLOG) MBR(SAVFLG) TEXT('LIB' +
+                          *BCAT &LIB *BCAT &TIM *BCAT &DAT)
+             enddo
+/* Suppression  SAVF */
+if cond(&dltsavf  *eq '*YES') then(do)
+             DLTF       &LIBF/&LIB
+             enddo
+
+             INCLUDE    SRCMBR(ERREUR2)
+
+             ENDPGM

@@ -1,0 +1,16 @@
+GSENDQQ,1
+0001 ?sndftplib
+0002 ?sndftpobj
+0003 ?sndftpmbr
+0004 ?sndtcpsplf
+0005 ?sndftpifs
+0006 ?dspftplst
+0007 dspftplog
+0008 ?sndmailbib
+0009 ?sndmailfic
+0010 ?sndmailout
+0011 ?sndmailspl
+0012+? SNDSMTPEMM RCP(('votre@email.com')) SUBJECT('Envoi document') NOTE('Ci-jo
+int votre fichier') ATTACH((VOTREFIC))
+0013 ?WRKSMTPEMM
+0014 WRKSMTPUSR

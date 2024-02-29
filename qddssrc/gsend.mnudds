@@ -1,0 +1,47 @@
+     A* Menu de format libre : GSEND
+     A*%%TS  SD  20190220  232311  QSECOFR     REL-V7R3M0  5770-WDS
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3                  -
+     A                                             27 132 *DS4)
+     A                                      CHGINPDFT
+     A                                      INDARA
+     A                                      PRINT(*LIBL/QSYSPRT)
+     A          R GSEND
+     A*%%TS  SD  20190220  232311  QSECOFR     REL-V7R3M0  5770-WDS
+     A                                      DSPMOD(*DS3)
+     A                                      LOCK
+     A                                      SLNO(01)
+     A                                      CLRL(*ALL)
+     A                                      ALWROL
+     A                                      CF03
+     A                                      HELP
+     A                                      HOME
+     A                                      HLPRTN
+     A                                  1  2'GSEND'
+     A                                      COLOR(BLU)
+     A                                  1 34'GSEND Menu pour Envoyer'
+     A                                      DSPATR(HI)
+     A                                  3  2'Choisir une des options suivantes -
+     A                                      :'
+     A                                      COLOR(BLU)
+     A                                  4  7'* Par FTP *'
+     A                                      DSPATR(HI)
+     A                                  5  7'1. Envoyer une bibliothèque'
+     A                                  6  7'2. Envoyer un objet'
+     A                                  7  7'3. Envoyer un membre'
+     A                                  9  7'5. Envoyer un fichier ifs'
+     A                                 13  7'8. Envoyer une bibliothèque'
+     A                                 14  7'9. Envoyer un fichier'
+     A                                 15  6'10. Envoyer une outq'
+     A                                 16  6'11. Envoyer un Spool'
+     A* CMDPROMPT  Ne pas supprimer cette spécification DDS.
+     A                                019  2'Option ou commande                -
+     A                                          '
+     A                                 12  7'* Par Mail *'
+     A                                      DSPATR(HI)
+     A                                 18  6'13. Voir la Log SMTP'
+     A                                  8  7'4. Envoyer un spool'
+     A                                 10  7'6. Voir Répertoire distant'
+     A                                 17  6'12. Envoyer un fichier ifs'
+     A                                 19  6'14. Gestion des utilisateurs'
+     A                                 11  7'7. Voir la log FTP'

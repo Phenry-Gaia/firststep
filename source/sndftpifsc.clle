@@ -1,0 +1,63 @@
+PGM PARM(&SYS &USR &PWD &ifs &rpt &rptc)
+DCL &SYS *CHAR 40
+DCL &USR *CHAR 10
+DCL &PWD *CHAR 50
+DCL &ifs *CHAR 132
+DCL &rpt *CHAR 132
+DCL &rptc *CHAR 132
+/* */
+DCL &TIM  *CHAR 6
+DCL VAR(&MSG) TYPE(*CHAR) LEN(132)
+MONMSG MSGID(CPF0000) EXEC(GOTO CMDLBL(ERREUR))
+/*-----------------------------------------------------------------*/
+/* CREATION DU FICHIER DE SAUVEGARDE   ET SAUVEGARDE               */
+/*-----------------------------------------------------------------*/
+RTVSYSVAL QTIME &TIM
+/**/
+  CRTSRCPF   FILE(QTEMP/QFTPSRC) RCDLEN(512) MBR(SNDIFS)
+MONMSG CPF7302  EXEC(DO)
+           CLRPFM     FILE(QTEMP/QFTPSRC)  MBR(SNDIFS)
+             ENDDO
+/**/
+dltf  FILE(QTEMP/QFTPLOG)
+ monmsg CPF2105
+  CRTSRCPF   FILE(QTEMP/QFTPLOG) RCDLEN(512) MBR(SNDIFSLOG)
+MONMSG CPF7302  EXEC(DO)
+             CLRPFM   FILE(QTEMP/QFTPLOG) MBR(SNDIFSLOG)
+             GOTO SUITE
+             ENDDO
+SUITE:
+/*-----------------------------------------------------------------*/
+/* substitution des entrées                                        */
+/*-----------------------------------------------------------------*/
+           OVRDBF     FILE(QFTPSRC) TOFILE(QTEMP/QFTPSRC)  MBR(SNDIFS)
+           OVRDBF     FILE(INPUT) TOFILE(QTEMP/QFTPSRC) MBR(SNDIFS)
+/* si même repertoire */
+           if cond(&rptc = '*SAME') then(do)
+           chgvar &rptc &rpt
+           enddo
+     /* generation du sripte ftp */
+             CALL       PGM(SNDFTPIFSR) PARM(&SYS &USR &PWD &IFS +
+                          &RPT &RPTC)
+/*-----------------------------------------------------------------*/
+/* EXECUTION DU SCRIPTE FTP                                        */
+/*-----------------------------------------------------------------*/
+
+           CLRPFM     FILE(QTEMP/QFTPLOG) MBR(SNDIFSLOG)
+           OVRDBF     FILE(OUTPUT) TOFILE(QTEMP/QFTPLOG) MBR(SNDIFSLOG)
+     /* execution scripte ftp */
+           FTP &SYS
+           DLTOVR INPUT
+           MONMSG CPF0000
+           DLTOVR OUTPUT
+           MONMSG CPF0000
+           DLTOVR QFTPSRC
+           MONMSG CPF0000
+ /*        DLTF   FILE(QTEMP/QFTPSRC)    */
+           GOTO FIN
+ERREUR:
+           RCVMSG MSGTYPE(*EXCP) RMV(*NO) MSG(&MSG)
+           SNDPGMMSG MSGID(CPF9898) MSGF(QCPFMSG) MSGDTA(&MSG) +
+           MSGTYPE(*ESCAPE)
+           FIN:
+ENDPGM

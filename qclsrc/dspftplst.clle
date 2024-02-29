@@ -1,0 +1,74 @@
+/*-------------------------------------------------------------------*/
+/* affichage repertoire remote                                       */
+/*-------------------------------------------------------------------*/
+             PGM        PARM(&SYS &USR &PWD &REPERT &port)
+/* PARAMETRES */
+             DCL        &SYS *CHAR 80
+             DCL        &USR *CHAR 10
+             DCL        &PWD *CHAR 50
+             DCL        &REPERT *CHAR 50
+             DCL        &port   *dec  (5 0)
+/* VARIABLES DE TRAVAIL */
+             DCL        &TIM  *CHAR 6
+             DCL        &dat  *CHAR 6
+dcl &curlib    *char 10
+             INCLUDE    SRCMBR(ERREUR1)
+rtvjoba curlib(&curlib)
+chgcurlib gsend
+             RTVSYSVAL  SYSVAL(QTIME) RTNVAR(&TIM)
+             RTVSYSVAL  SYSVAL(Qdate) RTNVAR(&dat)
+
+/* Création Fichier de scripte FTP */
+             CRTPF   FILE(QTEMP/QFTPSRC) RCDLEN(192)
+             MONMSG     CPF7302  EXEC(DO)
+                CLRPFM     FILE(QTEMP/QFTPSRC)
+             ENDDO
+/* Création Fichier de log FTP */
+             CRTSRCPF   FILE(QTEMP/QFTPLOG) RCDLEN(192) MBR(SAVFLG)
+             MONMSG     CPF7302  EXEC(DO)
+                CLRPFM     FILE(QTEMP/QFTPLOG) MBR(SAVFLG)
+                GOTO       SUITE
+             ENDDO
+
+ SUITE:
+/*-----------------------------------------------------------------*/
+/* substitution INPUT par qftpsrc                                  */
+/*-----------------------------------------------------------------*/
+     OVRDBF     FILE(INPUT) TOFILE(QTEMP/QFTPSRC)
+/*-----------------------------------------------------------------*/
+/* CREATION DU scripte ftp                                         */
+/*-----------------------------------------------------------------*/
+
+             RUNSQL     SQL('INSERT INTO QTEMP/QFTPSRC VALUES(''' +
+                         *CAT &USR *BCAT &PWD *CAT ''')') COMMIT(*NONE)
+             RUNSQL     SQL('INSERT INTO QTEMP/QFTPSRC VALUES(''' +
+                          *TCAT 'cd' *BCAT &repert *CAT ''')') +
+                          COMMIT(*NONE)
+             RUNSQL     SQL('INSERT INTO QTEMP/QFTPSRC +
+                          VALUES(''LS (DISK'')') COMMIT(*NONE)
+             RUNSQL     SQL('INSERT INTO QTEMP/QFTPSRC +
+                          VALUES(''QUIT'')') COMMIT(*NONE)
+
+/*-----------------------------------------------------------------*/
+/* EXECUTION DU SCRIPTE FTP                                        */
+/*-----------------------------------------------------------------*/
+             OVRDBF     FILE(OUTPUT) TOFILE(QTEMP/QFTPLOG) MBR(SAVFLG)
+             FTP        RMTSYS(&SYS) PORT(&PORT)
+             DLTOVR     INPUT
+             MONMSG     CPF0000
+             DLTOVR     OUTPUT
+             MONMSG     CPF0000
+/* affichage du fichier */
+             CALL       PGM(LSTRMTR) PARM(&SYS &REPERT)
+/* Effacement log    */
+    /*       CLRPFM     FILE(QTEMP/QFTPLOG) MBR(SAVFLG)  */
+if cond(&curlib *ne '*NONE') then(do)
+chgcurlib &curlib
+enddo
+else do
+             CHGCURLIB  CURLIB(*CRTDFT)
+enddo
+
+             INCLUDE    SRCMBR(ERREUR2)
+
+             ENDPGM

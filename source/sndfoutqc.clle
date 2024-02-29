@@ -1,0 +1,46 @@
+pgm        parm(&outq &lib &MAIL &zip)
+ /*  Paramètres                                       */
+             dcl        &outq *char 10
+             dcl        &lib *char 10
+             dcl        &mail *char 50
+             dcl        &zip  *char 4
+ /*  Travail                                          */
+             dcl        &lnkf *char 100
+             dcl        &lnkz *char 100
+             dcl        &lnko *char 100
+             dcl        &subj *char 100
+             dcl        &note *char 100
+/* création des répertoires */
+             crtdir     ('/temp/')
+             monmsg     CPFA0A0
+             crtdir     ('/temp/savf/')
+             monmsg     CPFA0A0
+             chgvar     &lnkf ('/temp/savf/' *tcat &outq *tcat +
+                          '.savf')
+             RMVLNK     OBJLNK(&LNKF)
+             monmsg     (CPFA0A0 CPFA0A9)
+             chgvar     &lnko ('/qsys.lib/qgpl.lib/' *tcat &outq *tcat +
+                          '.file')
+   chgvar     &subj ('fichier SAVF :' *bcat &lib *tcat '.savf')
+             CHGVAR     VAR(&NOTE) VALUE('Contient l''OUTQ' *bcat  +
+                          &outq *bcat 'de la bibliothèque' *bcat &outq )
+             dltf       FILE(qgpl/&outq)
+             monmsg     CPF2105
+             CRTSAVF    FILE(qgpl/&outq)
+             SAVOBJ     OBJ(&OUTQ) LIB(&LIB) DEV(*SAVF) +
+                          SAVF(QGPL/&outq) SPLFDTA(*ALL) +
+                          PVTAUT(*YES) DTACPR(*HIGH)
+             CPY        OBJ(&LNKO) TOOBJ(&LNKF) DTAFMT(*BINARY)
+   if cond(&zip = '*YES') then(do)
+             chgvar &lnkz (&lnkf *tcat '.zip')
+             RMVLNK     OBJLNK(&LNKZ)
+             monmsg     (CPFA0A0 CPFA0A9)
+             CPYTOARCF  FROMFILE(&lnkf) TOARCF(&lnkz)
+             SNDSMTPEMM RCP((&MAIL)) SUBJECT(&SUBJ) NOTE(&NOTE) +
+                          ATTACH((&LNKZ))
+   enddo
+   else do
+             SNDSMTPEMM RCP((&MAIL)) SUBJECT(&SUBJ) NOTE(&NOTE) +
+                          ATTACH((&LNKF))
+   enddo
+   endpgm

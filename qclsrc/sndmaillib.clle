@@ -1,0 +1,82 @@
+/*------------------------------------------------------*/
+/* Envoi  d'une Bibliothèque par mail                   */
+/*   sous forme de SAVF en pièce jointe                 */
+/*------------------------------------------------------*/
+             pgm        parm(&LIB &MAIL &ver &libsavf)
+  /* parametres */
+             dcl        &lib *char 10
+             dcl        &mail *char 50
+             dcl        &ver  *char 08
+             dcl        &libsavf *char 10
+  /* Variables */
+             dcl        &lnkf *char 100
+             dcl        &lnko *char 100
+             dcl        &lnkz *char 100
+             dcl        &subj *char 100
+             dcl        &note *char 400
+             dcl        &ver9 *char 09
+             dcl        &texte *char 50
+             dcl        &qsh   *char 200
+
+             INCLUDE    SRCMBR(ERREUR1)
+
+  /* création répertoire */
+             crtdir     ('/temp/')
+             monmsg     CPFA0A0
+             crtdir     ('/temp/savf/')
+             monmsg     CPFA0A0
+             chgvar     &lnkf ('/temp/savf/' *tcat &lib *tcat '.savf')
+             RMVLNK     OBJLNK(&LNKF)
+             monmsg     (CPFA0A0 CPFA0A9)
+             CHGVAR     VAR(&LNKO) VALUE('/qsys.lib/' *TCAT &LIBSAVF +
+                          *TCAT '.lib/' *TCAT &LIB *TCAT '.file')
+  /* préparation bibliothèque de savf */
+             CRTLIB     LIB(&libsavf)
+             monmsg     CPF2111
+             dltf       FILE(&libsavf/&LIB)
+             monmsg     CPF2105
+             CRTSAVF    FILE(&libsavf/&LIB)
+  /* Création du fichier ZIP */
+             SAVLIB     LIB(&LIB) DEV(*SAVF) SAVF(&libsavf/&LIB) +
+                          TGTRLS(&VER) DTACPR(*HIGH)
+             MONMSG     MSGID(CPF3702) EXEC(DO)
+                SNDUSRMSG  MSG('Des objets de la bibliothèques,' *BCAT +
+                             &LIB *BCAT 'ne peuvent pas être sauvegardés +
+                             vers la version,' *BCAT &VER) MSGTYPE(*INFO)
+                return
+             enddo
+             CPY        OBJ(&LNKO) TOOBJ(&LNKF) DTAFMT(*BINARY)
+             CHGVAR     VAR(&LNKZ) VALUE(&LNKF *TCAT '.ZIP')
+             RMVLNK     OBJLNK(&LNKZ)
+             monmsg     (CPFA0A0 CPFA0A9)
+
+  /* Zippage du fichier */
+  /* 7.3     CPYTOARCF  FROMFILE(&LNKF) TOARCF(&LNKZ)  */
+             CHGVAR     VAR(&QSH) VALUE('cd /temp/savf/ ; JAR -cfM' *BCAT +
+                          &LNKZ *BCAT &LNKF)
+             STRQSH     CMD(&QSH)
+  /* Envoi du message */
+             chgvar     &subj ('fichier SAVF :' *bcat &lib *tcat '.savf')
+  /* récupération version courante */
+             if         cond(&ver = '*CURRENT') then(do)
+                RTVOBJD    OBJ(QSYS) OBJTYPE(*LIB) SYSLVL(&Ver9)
+                CHGVAR     VAR(&VeR ) VALUE(%SST(&VeR9 1 1) *TCAT +
+                             %SST(&VeR9 3 2) *TCAT %SST(&VeR9 6 3))
+             enddo
+             RTVOBJD    OBJ(&LIB) OBJTYPE(*LIB) TEXT(&TEXTE)
+             CHGVAR     VAR(&NOTE) VALUE('<BR><B><U>Pour restaurer +
+                          la bibliothèque</U></B><BR><BR><BR>' *CAT +
+                          &LIB *BCAT ':' *BCAT &TEXTE *BCAT +
+                          '<BR>Dézipper le fichier.<BR> Copier le +
+                          fichier SAVF par FTP en mode binaire sur +
+                          votre IBM i.<BR>RSTLIB LIB(' *CAT &LIB +
+                          *TCAT ') DEV(*SAVF) SAVF(' *TCAT &LIBSAVF +
+                          *TCAT '/' *TCAT &LIB *TCAT ')<BR><BR><B> +
+                          La version utilisée est la' *BCAT &VER +
+                          *CAT '</B><BR><BR><a +
+                          href="www.gaia.fr">www.gaia.fr</a>')
+             SNDSMTPEMM RCP((&MAIL)) SUBJECT(&SUBJ) NOTE(&NOTE) +
+                          ATTACH((&LNKF)) CONTENT(*HTML)
+
+             INCLUDE    SRCMBR(ERREUR2)
+endpgm

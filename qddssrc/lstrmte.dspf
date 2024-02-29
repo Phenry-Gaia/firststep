@@ -1,0 +1,59 @@
+     A*%%TS  SD  20190223  085405  QSECOFR     REL-V7R3M0  5770-WDS
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/LSOUTPUT LSOUTPUT)
+     A                                      CA03(03)
+     A          R SFL01                     SFL
+     A*%%TS  SD  20190223  085405  QSECOFR     REL-V7R3M0  5770-WDS
+     A            OPT01          1A  B  6  3
+     A            LSOUT70       70   O  6  7
+     A            FLSOUTPUT    256   H
+     A          R CTL01                     SFLCTL(SFL01)
+     A*%%TS  SD  20190223  085405  QSECOFR     REL-V7R3M0  5770-WDS
+     A                                      CA04(04)
+     A                                      CF05(05)
+     A                                      OVERLAY
+     A  41                                  SFLDSP
+     A  42                                  SFLDSPCTL
+     A  40                                  SFLCLR
+     A  43                                  SFLEND(*MORE)
+     A                                      SFLSIZ(0017)
+     A                                      SFLPAG(0016)
+     A                                  5  3'Opt                      Répertoir-
+     A                                      e                                  -
+     A                                              '
+     A                                      DSPATR(UL)
+     A                                      DSPATR(HI)
+     A                                  1 24'Liste des fichiers distants'
+     A                                      DSPATR(HI)
+     A                                  3  3'Répertoire :'
+     A                                      DSPATR(HI)
+     A                                  2  3'Systéme :'
+     A                                      DSPATR(HI)
+     A            P_RMTSYS      60   O  2 13
+     A            P_RMTREP      50   B  3 16
+     A          R FMT01
+     A*%%TS  SD  20180522  154303  BERTHOIN    REL-V7R3M0  5770-WDS
+     A                                 23  3'F3=Exit'
+     A                                      DSPATR(HI)
+     A                                 23 12'F5=Refresh'
+     A                                      DSPATR(HI)
+     A          R FMT02
+     A*%%TS  SD  20180705  104702  BERTHOIN    REL-V7R3M0  5770-WDS
+     A                                      CA12(12)
+     A                                  1  3DATE
+     A                                      EDTCDE(Y)
+     A                                      DSPATR(HI)
+     A                                  1 25'Descrpition d''un scénario'
+     A                                      DSPATR(HI)
+     A                                  1 70USER
+     A                                      DSPATR(HI)
+     A                                  2  3TIME
+     A                                      DSPATR(HI)
+     A            TEXTE         30A  O  2 25DSPATR(RI)
+     A                                  2 70SYSNAME
+     A                                      DSPATR(HI)
+     A                                 23  3'F3=Exit'
+     A                                      DSPATR(HI)
+     A                                 23 12'F12=Return'
+     A                                      DSPATR(HI)

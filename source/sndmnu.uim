@@ -1,0 +1,213 @@
+.*-------------------------------------
+.*
+.*Génération CVTMNUSRC
+.*  Le 7211472114
+.*-------------------------------------
+.* CRTMNU MENU(votrebib/MENUUIM)
+.*        TYPE(*UIM)
+.*        SRCFILE(votrebib/QRPGLESRC)
+:PNLGRP SCHIDX=hlphlp DFTMSGF=hlpuim SUBMSGF=hlpuim.
+:COPYR.
+Gaia 2008
+:VAR  name=ZMENU.
+.*-------------------------------------
+.* Listes des touches de fonctions
+.*-------------------------------------
+:KEYL  NAME=menukeys  HELP=keyl.
+:KEYI  Key=F1         HELP=helpf1   ACTION=HELP.
+:KEYI  Key=F3         HELP=exit     ACTION='EXIT SET'  VARUPD=NO.
+F3=Exit
+:KEYI  Key=F4         HELP=prompt   ACTION=prompt.
+F4=Invite
+:KEYI  Key=F9         HELP=retrieve ACTION=RETRIEVE.
+F9=Rappel
+:KEYI  Key=F12        HELP=cancel   ACTION='CANCEL SET' varupd=no.
+F12=Annuler
+:KEYI  Key=F24        HELP=morekeys ACTION=MOREKEYS.
+F24=Autres touches
+:KEYI  Key=ENTER      HELP=enter    ACTION=enter.
+:KEYI  Key=HELP       HELP=help     ACTION=help.
+:KEYI  Key=HOME       HELP=home     ACTION=home.
+:KEYI  Key=PAGEDOWN   HELP=pagedown ACTION=pagedown.
+:KEYI  Key=PAGEUP     HELP=Pageup   ACTION=pageup.
+:KEYI  Key=PRINT      HELP=Print    ACTION=print.
+:EKEYL.
+
+:PANEL   Name=JOBUSR
+         help='menu/help'
+         keyl=menukeys
+         enter='MSG CPD9817 QCPFMSG'
+         panelid=zmenu
+         .
+Menu Des Envois SNDXX
+.*-------------------------------------------------------------
+.*  Changer juste scroll=no si peu d'options.
+.*-------------------------------------------------------------
+
+:menu depth='*' scroll=no   botsep=space.
+:topinst.----------------------------------------
+:topinst.Choisissez l'une des options suivantes :
+:topinst.----------------------------------------
+
+:menugrp.
+:menui option=01 action='CMD ?SNDLIB'
+help='menu/OPTION_01'.
+Envoi Bibliothèque
+:menui option=02 action='CMD ?SNDOBJ'
+help='menu/OPTION_02'.
+Envoi Objet
+:menui option=03 action='CMD SNDLOG'
+help='menu/OPTION_03'.
+Afficher la log
+:menui option=04 action='CMD SNDFTP'
+help='menu/OPTION_04'.
+Afficher le scripte FTP
+:menui option=05 action='CMD ?SNDEXEC'
+help='menu/OPTION_05'.
+Réexécuter un scripte FTP
+:menui option=06 action='CMD ?WRKSNDLOG'
+help='menu/OPTION_06'.
+Gestion des envois Effectués
+:menui option=07 action='CMD CALL WSNDOBJR'
+help='menu/OPTION_07'.
+Gestion des envois en groupe fichier WSNDOBJP
+:menui option=08 action='CMD ?WSNDOBJ'
+help='menu/OPTION_08'.
+Envoi en groupe fichier WSNDOBJP
+:emenugrp.
+:emenu.
+:cmdline size=long.
+Option ou commande.
+:epanel.
+
+:help name=keyl.
+Touches de commande - Aide.
+:xh3.Touches de commande
+:ehelp.
+
+:help name=helpf1.
+:parml.
+:pt.F1=Help
+:pd.Aide générale sur le menu, une option ou touche de fonction.
+:eparml.
+:ehelp.
+
+:help name=exit.
+:parml.
+:pt.F3=Exit
+:pd.Abandon de l'écran en cours et retour à l'option qui l'a appelé.
+:eparml.
+:ehelp.
+
+:help name=prompt.
+:parml.
+:pt.F4=Invite.
+:pd.Affiche une aide pour entrer ou saisir une commande.
+:eparml.
+:ehelp.
+
+:help name=retrieve.
+:parml.
+:pt.F9=Rappel.
+:pd.Rappel d'une commande précédente.
+:eparml.
+:ehelp.
+
+:help name=cancel.
+:parml.
+:pt.F12=Annuler.
+:pd.Retour au menu ou à  l'écran précédent.
+:eparml.
+:ehelp.
+
+:help name=morekeys.
+:parml.
+:pt.F24=Autres touches
+:pd.Affichage de touches de fonction complémentaires.
+:eparml.
+:ehelp.
+
+:help name=pagedown.
+:parml.
+:pt.Flèche bas.
+:pd.Ecran suivant
+:eparml.
+:ehelp.
+
+:help name=pageup.
+:parml.
+:pt.Flèche Haut.
+:pd.Ecran précédent.
+:eparml.
+:ehelp.
+
+:help name=print.
+:parml.
+:pt.Print.
+:pd.Impression de l'écran en cours.
+:eparml.
+:ehelp.
+
+:help name=enter.
+:parml.
+:pt.Entrée.
+:pd.Permet de valider une saisie.
+:eparml.
+:ehelp.
+
+:help name=help.
+:parml.
+:pt.Aide.
+:pd.Aide générale sur le menu.
+:eparml.
+:ehelp.
+
+:help name=home.
+:parml.
+:pt.Home.
+:pd.Retour au menu initial.
+:eparml.
+:ehelp.
+
+:help name='menu/help'.
+Aide générale Menu.
+:p.Ce menu présente un ensemble de commandes JOBUSR.
+:p.Une aide en ligne est disponible pour chacune des commandes
+:ehelp.
+:help name='menu/OPTION_01'.
+Commande SNDLIB'.
+:p.OPTION 01 - Permet d'envoyer une bibliothèque vers une autre
+ machine
+:ehelp.
+:help name='menu/OPTION_02'.
+Commande SNDOBJ'.
+:p.OPTION 02 - Permet d'envoyer un objet vers une autre machine
+:ehelp.
+:help name='menu/OPTION_03'.
+Commande SNDLOG'.
+:p.OPTION 03 - Permet de voir la log d'un envoi SNDOBJ ou SNDLIB
+:ehelp.
+:help name='menu/OPTION_04'.
+Commande SNDFTP'.
+:p.OPTION 04 - Permet de voir le scripte FTP Généré, par défaut ce
+scripte est supprimé, paramètre DLTF(*YES) sur les commandes SNDXX
+:ehelp.
+:help name='menu/OPTION_05'.
+Commande SNDLOG'.
+:p.OPTION 05 - Permet de rejouer un scripte FTP
+:ehelp.
+:help name='menu/OPTION_06'.
+Commande WRKSNDLOG'.
+:p.OPTION 06 - Permet de consulter le envois déjà effectués
+:ehelp.
+:help name='menu/OPTION_07'.
+Commande WSNDOBJ  '.
+:p.OPTION 07 - Permet la gestion des envois groupés dans le
+ fichier WSNDOBJP
+:ehelp.
+:help name='menu/OPTION_08'.
+Commande WSNDOBJ  '.
+:p.OPTION 08 - Permet d'envoyer tous les objets paramétrés dans le
+ fichier WSNDOBJP
+:ehelp.
+:epnlgrp.

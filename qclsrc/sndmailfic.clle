@@ -1,0 +1,115 @@
+PGM PARM(&MBR1 &FIC1 &LIB1 &EMAIL  &ZIP)
+             COPYRIGHT  TEXT('Copyright Gaia 2012')
+/*                                                                  */
+/* ENVOI D'UN FICHIER PAR MAIL                                      */
+/*------------------------------------------------------------------*/
+/* PARAMETRES                                                       */
+DCL &MBR1 *CHAR 10   /* MEMBRE       1                              */
+DCL &LIB1 *CHAR 10   /* BIBLIOTHEQUE 1                              */
+DCL &FIC1 *CHAR 10   /* FICHIER      1                              */
+DCL &EMAIL *CHAR 60  /* MAIL DE L'EMETTEUR                          */
+DCL &ZIP    *CHAR 04 /* *YES OU *NO                                 */
+/* VARIABLES DE TRAVAIL */
+DCL &CURUSR *CHAR 10
+DCL &CURDIR *CHAR 9999
+DCL &LEN *DEC (7 0)
+DCL &PCFIC  *CHAR 150
+DCL &DATE  *CHAR  6
+DCL &TIME  *CHAR  6
+DCL &TYPE  *CHAR  5
+DCL &USER  *CHAR  10
+DCL &NBR   *DEC  10
+DCL &QSH   *CHAR 250
+DCL &sql   *CHAR 250
+/**/
+/* */
+DCL &ATTACH  *CHAR 100
+DCL &SUBJECT *CHAR 100
+DCL &note    *CHAR 400
+dcl &version *char 30  ('Version : 11/06/2014')
+dcl &texte *char 50
+             INCLUDE    SRCMBR(ERREUR1)
+RTVJOBA USER(&CURUSR)
+             RTVCURDIR  RTNDIR(&CURDIR) DIRNAMLEN(&LEN)
+             RTVJOBA USER(&USER)
+             RTVSYSVAL  SYSVAL(QDATE) RTNVAR(&DATE)
+             RTVSYSVAL  SYSVAL(QTIME) RTNVAR(&TIME)
+             RTVMBRD    FILE(&LIB1/&FIC1) MBR(&MBR1) FILETYPE(&TYPE) +
+                          NBRCURRCD(&NBR)
+ IF COND(&NBR = 0       ) THEN(DO)
+             SNDUSRMSG  MSG('FICHIER' *BCAT &FIC1 *BCAT 'VIDE') +
+                          MSGTYPE(*INFO)
+             return
+                          ENDDO
+ IF COND(&TYPE = '*SRC' ) THEN(DO)
+             RTVOBJD    OBJ(&LIB1/&FIc1) OBJTYPE(*FILE) TEXT(&TEXTE)
+             CHKOBJ     OBJ(QTEMP/SOURCE) OBJTYPE(*FILE)
+             MONMSG CPF9801 EXEC(DO)
+             CRTPF      FILE(QTEMP/SOURCE) RCDLEN(512)
+             ENDDO
+             CHGVAR     VAR(&PCFIC) VALUE(&LIB1 *TCAT '_' *TCAT +
+                          &FIC1 *TCAT '_' *TCAT &MBR1 *TCAT '.TXT')
+  ENDDO
+  ELSE DO
+             CHGVAR     VAR(&PCFIC) VALUE(&LIB1 *TCAT '_' *TCAT +
+                          &FIC1 *TCAT '_' *TCAT &MBR1 *TCAT '.CSV')
+  ENDDO
+                          RMVLNK &PCFIC
+                          MONMSG CPFA0A9
+/*------------------------------------------------------------------*/
+/*  FICHIER SOURCES                                                 */
+/*------------------------------------------------------------------*/
+ IF COND(&TYPE = '*SRC' ) THEN(DO)
+chgvar &note ('<BR> Le Fichier est un source.<BR>')
+             RTVMBRD    FILE(&LIB1/&FIC1) MBR(&MBR1) TEXT(&TEXTE)
+             CPYF       FROMFILE(&LIB1/&FIC1) +
+                          TOFILE(QTEMP/SOURCE) FROMMBR(&MBR1) +
+                          MBROPT(*REPLACE) FMTOPT(*CVTSRC)
+             CPYTOSTMF  +
+                          FROMMBR('/qsys.lib/QTEMP.lib/SOURCE.file/SO+
+                          URCE.MBR') TOSTMF(%SST(&CURDIR 1 &LEN) +
+                          *TCAT '/' *CAT &PCFIC) STMFCCSID(*PCASCII)
+             ENDDO
+             ELSE DO
+/*------------------------------------------------------------------*/
+/*  COPIE D'UN FICHIER DB2                                          */
+/*------------------------------------------------------------------*/
+chgvar &note ('<BR> Le Fichier est un CSV<BR>')
+             CPYTOIMPF  FROMFILE(&LIB1/&FIC1 &MBR1) +
+                          TOSTMF(%SST(&CURDIR 1 &LEN) *TCAT '/' +
+                          *CAT &PCFIC) MBROPT(*REPLACE) +
+                          STMFCCSID(*PCASCII) RCDDLM(*CRLF) +
+                          STRDLM(*NONE) FLDDLM(';')
+    /* V7R3               ADDCOLNAM(*SQL)       */
+             ENDDO
+/*------------------------------------------------------------------*/
+/*  zippage du fichier si demandé                                   */
+/*------------------------------------------------------------------*/
+  IF COND(&ZIP = '*YES') THEN(DO)
+             CHGVAR     VAR(&QSH) VALUE('cd' *BCAT &CURDIR *TCAT '/ +
+                          ; JAR -cfM' *BCAT &PCFIC *TCAT '.ZIP' +
+                          *BCAT &PCFIC)
+             STRQSH     CMD(&QSH)
+  ENDDO
+/*------------------------------------------------------------------*/
+/*  ENVOI DU FICHIER                                                */
+/*------------------------------------------------------------------*/
+             IF         COND(&EMAIL *NE ' ') THEN(DO)
+/* SI ZIP A */
+IF COND(&ZIP = '*YES') THEN(DO)
+CHGVAR &PCFIC    (&PCFIC *TCAT '.ZIP')
+             CHGVAR     VAR(&NOTE) VALUE(&NOTE *BCAT '<BR> Le +
+                          Fichier est Zippé <BR>')
+ENDDO
+             CHGVAR     VAR(&ATTACH) VALUE(&PCFIC)
+             CHGVAR     VAR(&SUBJECT) VALUE('Le Fichier :' *BCAT &PCFIC)
+             CHGVAR     VAR(&NOTE) VALUE(&NOTE *BCAT '<BR>' *TCAT +
+                          &TEXTE *CAT '<BR><BR><a +
+                          href="www.gaia.fr">www.gaia.fr</a>')
+             SNDSMTPEMM RCP((&EMAIL)) SUBJECT(&SUBJECT) NOTE(&NOTE) +
+                          ATTACH((&ATTACH)) CONTENT(*HTML)
+ enddo
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) +
+                          MSGDTA('Fichier' *bcat &PCFIC *bcat +
+                          'envoyé') MSGTYPE(*COMP)
+             INCLUDE    SRCMBR(ERREUR2)

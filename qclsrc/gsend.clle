@@ -1,0 +1,5 @@
+pgm
+INCLUDE    SRCMBR(ERREUR1)
+go gsend
+INCLUDE    SRCMBR(ERREUR2)
+endpgm

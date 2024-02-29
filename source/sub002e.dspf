@@ -1,0 +1,105 @@
+     A*%%TS  SD  20140709  143606  BERTHOIN    REL-V7R1M0  5770-WDS
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      CA03(03)
+     A                                      CA04(04)
+     A                                      CA06(06)
+     A                                      CF14(14)
+     A          R FMT01
+     A*%%TS  SD  20140709  143606  BERTHOIN    REL-V7R1M0  5770-WDS
+     A                                  1 24'Paramétrage d''un Sous Fichier'
+     A                                      DSPATR(HI)
+     A                                  2 20'Titre :'
+     A                                      DSPATR(HI)
+     A            TIT01         30A  B  2 28CHECK(LC)
+     A  51                                  DSPATR(PR)
+     A N51                                  DSPATR(MDT)
+     A                                      COMP(GT ' ')
+     A            LIG01         78A  B  4  2CHECK(LC)
+     A  51                                  DSPATR(PR)
+     A            LIG02         78A  B  5  2CHECK(LC)
+     A  51                                  DSPATR(PR)
+     A            LIG03         78A  B  6  2CHECK(LC)
+     A  51                                  DSPATR(PR)
+     A            SQL01        500A  B  8  2CHECK(LC)
+     A  51                                  DSPATR(PR)
+     A N51                                  DSPATR(MDT)
+     A                                      COMP(GT ' ')
+     A                                 23  2'F3=Exit'
+     A                                      DSPATR(HI)
+     A                                  7  3'Requêtes SQL ----------------------
+     A                                      ------------------------------------
+     A                                      ------'
+     A                                      DSPATR(HI)
+     A                                  2  2'Pgm :'
+     A                                      DSPATR(HI)
+     A            TEXTE         20A  O  1 55DSPATR(RI)
+     A            PGM01         10A  B  2  8
+     A  50
+     AO 51                                  DSPATR(PR)
+     A  52                                  ERRMSG('Instance  déja existante' 5-
+     A                                      2)
+     A  50                                  DSPATR(HI)
+     A                                  3  3'--------------------------- 3 Lign-
+     A                                      es Entêtes -------------------------
+     A                                      -----'
+     A                                      DSPATR(HI)
+     A            WHE01        400A  B 15  1
+     A  51                                  DSPATR(PR)
+     A                                      CHECK(LC)
+     A                                 20  3'Option'
+     A                                      DSPATR(HI)
+     A            TRT01         10A  B 20 13
+     A  51                                  DSPATR(PR)
+     A                                 20 24'(Programme Option)'
+     A                                 23 29'F6=Création'
+     A                                      DSPATR(HI)
+     A            OPT01          1A  B 20 11VALUES('O' 'N')
+     A  51                                  DSPATR(PR)
+     A                                 20 43'Pos Parm'
+     A                                      DSPATR(HI)
+     A            POSPARM        2N  B 20 52RANGE('00' '99')
+     A  51                                  DSPATR(PR)
+     A                                 20 55'Len Parm'
+     A                                      DSPATR(HI)
+     A            LENPARM        2N  B 20 64RANGE('00' '99')
+     A  51                                  DSPATR(PR)
+     A                                 20 68'Pos Sel.'
+     A                                      DSPATR(HI)
+     A            POSSEL         2N  B 20 77RANGE('00' '99')
+     A  51                                  DSPATR(PR)
+     A                                 21  3'Prétaitement :'
+     A                                      DSPATR(HI)
+     A            WPRE01       142A  B 21 18CHECK(LC)
+     A  51                                  DSPATR(PR)
+     A                                 14 24'Where -----------------------------
+     A                                      --------------------'
+     A                                      DSPATR(HI)
+     A                                 23 11'F4=Liste options'
+     A                                      DSPATR(HI)
+     A                                 23 42'F14=Order by'
+     A                                      DSPATR(HI)
+     A          R FMT02
+     A*%%TS  SD  20140709  143425  BERTHOIN    REL-V7R1M0  5770-WDS
+     A                                      CA12(12)
+     A                                  1 24'Paramétrage d''un Sous Fichier'
+     A                                      DSPATR(HI)
+     A                                  2 20'Titre :'
+     A                                      DSPATR(HI)
+     A            TIT01         30A  O  2 28
+     A                                 23  2'F3=Exit'
+     A                                      DSPATR(HI)
+     A                                  7  3'Order By --------------------------
+     A                                      ------------------------------------
+     A                                      ------'
+     A                                      DSPATR(HI)
+     A                                  2  2'Pgm :'
+     A                                      DSPATR(HI)
+     A            TEXTE         20A  O  1 55DSPATR(RI)
+     A            PGM01         10A  O  2  8
+     A  50                                  DSPATR(HI)
+     A            ORD01        400A  B  8  1
+     A  51                                  DSPATR(PR)
+     A                                      CHECK(LC)
+     A                                 23 10'F12=Retours'
+     A                                      DSPATR(HI)
